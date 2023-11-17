@@ -10,8 +10,8 @@ GEN_OPTS__FLAG :=
 GEN_CMDS__FLAG := 
 
 ORDERED_OBJS += \
-"./AperiodicList.obj" \
 "./Scheduler.obj" \
+"./Utils.obj" \
 "./main.obj" \
 "./tm4c123gh6pm_startup_ccs.obj" \
 "../tm4c123gh6pm.cmd" \
@@ -145,8 +145,8 @@ project.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "AperiodicList.obj" "Scheduler.obj" "main.obj" "tm4c123gh6pm_startup_ccs.obj" 
-	-$(RM) "AperiodicList.d" "Scheduler.d" "main.d" "tm4c123gh6pm_startup_ccs.d" 
+	-$(RM) "Scheduler.obj" "Utils.obj" "main.obj" "tm4c123gh6pm_startup_ccs.obj" 
+	-$(RM) "Scheduler.d" "Utils.d" "main.d" "tm4c123gh6pm_startup_ccs.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 
