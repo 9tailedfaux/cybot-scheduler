@@ -20,11 +20,17 @@
 typedef uint8_t taskFuncFlag_t; //typedef for greater clarity when a uint8_t is used as a string of flags
 #define FLAG_RESET 0x01
 #define FLAG_FINISHED 0x02
+#define FLAG_EXIT 0x0004 //task is indicating that the program should terminate
+
+typedef uint16_t runFlag_t; //bits 15:8 store the task index that caused the issue
+#define FLAG_YIELD_ERROR 0x0001 //a task did not yield often enough
+#define FLAG_INSUFFICIENT_COMPTIME 0x0002 //a task did not complete in the comptime it was assigned
+//FLAG_EXIT is also used here
 
 //for representing a basic, generic task
 typedef struct {
     bool unique;                                                //if true, only one task with this function is allowed
-    bool (*function)(taskFuncFlag_t* flags, uint32_t compTime); //the function that actually represents the work to be done
+    void (*function)(taskFuncFlag_t* flags); //the function that actually represents the work to be done
     uint32_t compTime;                                          //computation time
     uint32_t remainingCompTime;                                 //remaining computation time
 } Task;
@@ -70,8 +76,9 @@ typedef struct _AperList {
 } AperList;
 
 PeriodicSchedule* buildScheduleEDF(PeriodicTaskSet);
-void run(SchedParams params);
-void addAperiodic(bool (*taskFunction)(taskFuncFlag_t* flags, uint32_t compTime), uint32_t);
-Task* newTask(bool (*taskFunction)(taskFuncFlag_t* flags, uint32_t compTime), uint32_t);
+void sched_init(void);
+runFlag_t run(SchedParams params);
+void addAperiodic(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t);
+Task* newTask(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t);
 void freeTask(Task*);
 Task* aperListDequeue(AperList*);
