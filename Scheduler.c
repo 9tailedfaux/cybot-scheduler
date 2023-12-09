@@ -1,6 +1,6 @@
 #include "Scheduler.h"
 #include "Utils.h"
-#include "Timer.h"
+#include "Timer.h" //NOTE: Timer code is from CPRE 288 and was not developed by me
 
 #include <stdlib.h>
 
@@ -11,7 +11,7 @@ void sched_init() {
     timer_stop();
 }
 
-runFlag_t run(SchedParams params) {
+runFlag_t run(SchedParams params, runFlag_t* flags) {
     PeriodicSchedule* schedule = buildScheduleEDF(params.tasks);
 
     uint32_t i;
@@ -135,7 +135,17 @@ void aperiodicServer(taskFuncFlag_t* flags) {
     }
 }
 
-Task* newTask(void (*taskFunction)(taskFuncFlag_t* flags), ) { //amogus
+PeriodicTask* newPeriodicTask(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t compTime, uint32_t period) {
+    PeriodicTask* pt = (PeriodicTask*)malloc(sizeof(PeriodicTask));
+    
+    pt->task = newTask(taskFunction, compTime);
+    pt->period = period;
+    pt->deadline = period;
+
+    return pt;
+}
+
+Task* newTask(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t compTime) { //amogus
     Task* task = (Task*)malloc(sizeof(Task));
     task->function = taskFunction;
     task->compTime = compTime;
