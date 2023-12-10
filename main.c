@@ -40,7 +40,7 @@ int main(void)
 
     //run in loop while FLAG_EXIT is not set
     while(!(flags & FLAG_EXIT)) {
-        run(params, &flags);
+        run(params);
     }
 
     if (flags & ERROR_FLAGS) {

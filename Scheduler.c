@@ -11,7 +11,7 @@ void sched_init() {
     timer_stop();
 }
 
-runFlag_t run(SchedParams params, runFlag_t* flags) {
+runFlag_t run(SchedParams params) {
     PeriodicSchedule* schedule = buildScheduleEDF(params.tasks);
 
     uint32_t i;
@@ -28,7 +28,7 @@ runFlag_t run(SchedParams params, runFlag_t* flags) {
         }
 
         //if current task's remainingCompTime is out of bounds, run aperiodic server instead
-        if (currentTask->task->remainingCompTime-- <= 0) currentTask = params.tasks.tasks; //i'm being sneaky and post-decrementing remainingCompTime here. if this doesn't work, let it be known i tried
+        if (currentTask->task->remainingCompTime-- <= 0) currentTask = params.tasks.tasks;
 
         timer_resume();
 
@@ -44,7 +44,8 @@ runFlag_t run(SchedParams params, runFlag_t* flags) {
                 return stopRun(FLAG_EXIT | currentTaskIndex, schedule);
             }
 
-            //if more than 2 milliseconds have passed, the task did not yield often enough and may need adjusted or be incompatible with this scheduler
+            //if more than 2 milliseconds have passed, the task did not yield often enough
+            //it may need adjusted or be incompatible with this scheduler
             if (timer_getMillis() > 2) {
                 return stopRun(FLAG_YIELD_ERROR | currentTaskIndex, schedule);
             }
@@ -55,10 +56,13 @@ runFlag_t run(SchedParams params, runFlag_t* flags) {
             return stopRun(FLAG_INSUFFICIENT_COMPTIME | currentTaskIndex, schedule);
         }
 
-        //if task has NOT run out of remainingCompTime but function DID finish, set task's remainingCompTime to zero. we will schedule the aperiodic server in its place
+        //if task has NOT run out of remainingCompTime but function DID finish, set task's remainingCompTime to zero.
+        //we will schedule the aperiodic server in its place
         if (currentTask->task->remainingCompTime > 0 && flags & FLAG_FINISHED) {
             currentTask->task->remainingCompTime = 0;
         }
+
+        timer_stop();
     }
 
     return stopRun(0x0000, schedule);
@@ -85,6 +89,10 @@ PeriodicSchedule* buildScheduleEDF(PeriodicTaskSet ts) {
 
             //if we have hit a multiple of the task's period, refill remaining computation time and set its deadline
             if (i % thisTask.period == 0) {
+                //if the task wasn't fully allocated, the schedule is impossible. return null
+                if (thisTask.task->remainingCompTime > 0) {
+                    return NULL;
+                }
                 thisTask.task->remainingCompTime = thisTask.task->compTime;
                 thisTask.deadline = i + thisTask.period;
             }
@@ -99,7 +107,9 @@ PeriodicSchedule* buildScheduleEDF(PeriodicTaskSet ts) {
         //task 0 will be run as default if all are cleared so make task 0 the aperiodic server for best results
 
         schedule[i] = currentTask; //add the chosen task to schedule
-        tasks[currentTask].task->remainingCompTime--; //we have scheduled the task for this time slot so decrement its remaining time
+        
+        //we have scheduled the task for this time slot so decrement its remaining time
+        tasks[currentTask].task->remainingCompTime--; 
     }
 
     container->indices = schedule;
@@ -165,10 +175,6 @@ void addAperiodic(void (*taskFunction)(taskFuncFlag_t* flags)) {
     else aperList.head = new;
     aperList.tail = new;
     aperList.count++;
-}
-
-void addPeriodic(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t compTime, uint32_t period) {
-
 }
 
 void freeTask(Task* t) {

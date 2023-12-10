@@ -16,23 +16,41 @@
  *
  * bit 1    0 - function has not yet finished
  *          1 - function has finished
+ *
+ * bit 2    0 - task has not indicated that the program should terminate
+ *          1 - task has indicated that the program should terminate
+ *
+ * bit 3:7  unused
  */
 typedef uint8_t taskFuncFlag_t; //typedef for greater clarity when a uint8_t is used as a string of flags
-#define FLAG_RESET 0x01
-#define FLAG_FINISHED 0x02
+#define FLAG_RESET 0x01 //pass-in flag for when task function should reset itself
+#define FLAG_FINISHED 0x02 //pass-back flag for when task has finished
 #define FLAG_EXIT 0x0004 //task is indicating that the program should terminate
 
 #define ERROR_FLAGS 0x0003 //a combination of all flags that indicate an error state
 
+/*
+ * bit 0    0 - functions yielded often enough
+ *          1 - yield error. a function did not yield often enough
+ *
+ * bit 1    0 - functions were given sufficient comptime
+ *          1 - insufficient comptime error. a function was not given sufficient comptime
+ *
+ * bit 2    0 - task has not indicated that the program should terminate
+ *          1 - task has indicated that the program should terminate
+ *
+ * bit 3:7  unused
+ *
+ * bit 8:15 stores the 8-bit unsigned index of the task that raised the other flag(s)
+ */
 typedef uint16_t runFlag_t; //flag to be used by run()
 #define FLAG_YIELD_ERROR 0x0001 //a task did not yield often enough
 #define FLAG_INSUFFICIENT_COMPTIME 0x0002 //a task did not complete in the comptime it was assigned
 #define FLAG_TASKINDEX 0xFF00 //bits 15:8 store the task index that caused the issue
-//FLAG_EXIT is also used here
+//FLAG_EXIT and ERROR_FLAGS are also relevant in runFlag_t
 
 //for representing a basic, generic task
-typedef struct {
-    bool unique;                                                //if true, only one task with this function is allowed
+typedef struct {                                              //if true, only one task with this function is allowed
     void (*function)(taskFuncFlag_t* flags); //the function that actually represents the work to be done
     uint32_t compTime;                                          //computation time
     uint32_t remainingCompTime;                                 //remaining computation time
@@ -78,11 +96,34 @@ typedef struct _AperList {
     uint8_t count;
 } AperList;
 
+//function to build a periodic schedule from a periodic task set
 PeriodicSchedule* buildScheduleEDF(PeriodicTaskSet);
+
+//function to initialize this entire scheduler
+//CALL THIS FIRST
 void sched_init(void);
-runFlag_t run(SchedParams params, runFlag_t* flags);
+
+//main program loop function
+runFlag_t run(SchedParams params);
+
+//creates a new aperiodic task according to the specification and appends it to the linked list
 void addAperiodic(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t);
+
+//creates and returns a new generic/aperiodic task according to the specification
 Task* newTask(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t);
+
+//creates and returns a new periodic task according to the specification
 PeriodicTask* newPeriodicTask(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t, uint32_t);
+
+//for freeing the struct and all relevant members
+//you making use of this library only need to free what you directly allocated
+//everything the library allocates it is already set up to free
 void freeTask(Task*);
+void freePeriodicTaskSet(PeriodicTaskSet* ts);
+void freeAperList(AperList* list);
+void freePeriodicSchedule(PeriodicSchedule* s);
+void freePeriodicTask(PeriodicTask* t);
+
+//dequeues a task from the aperiodic list
 Task* aperListDequeue(AperList*);
+Task* aperListPeek(AperList* list);
