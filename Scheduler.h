@@ -99,12 +99,15 @@ typedef struct _AperList {
 //function to build a periodic schedule from a periodic task set
 PeriodicSchedule* buildScheduleEDF(PeriodicTaskSet);
 
+void aperiodicServer(taskFuncFlag_t* flags);
+
 //function to initialize this entire scheduler
 //CALL THIS FIRST
 void sched_init(void);
 
 //main program loop function
 runFlag_t run(SchedParams params);
+runFlag_t stopRun(runFlag_t flags, PeriodicSchedule* schedule);
 
 //creates a new aperiodic task according to the specification and appends it to the linked list
 void addAperiodic(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t);
@@ -114,6 +117,7 @@ Task* newTask(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t);
 
 //creates and returns a new periodic task according to the specification
 PeriodicTask* newPeriodicTask(void (*taskFunction)(taskFuncFlag_t* flags), uint32_t, uint32_t);
+void fillPeriodicTask(PeriodicTask* task, void (*taskFunction)(taskFuncFlag_t* flags), uint32_t compTime, uint32_t period);
 
 //for freeing the struct and all relevant members
 //you making use of this library only need to free what you directly allocated

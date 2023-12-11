@@ -11,8 +11,11 @@ GEN_CMDS__FLAG :=
 
 ORDERED_OBJS += \
 "./Scheduler.obj" \
+"./Timer.obj" \
 "./Utils.obj" \
+"./lcd.obj" \
 "./main.obj" \
+"./testTasks.obj" \
 "./tm4c123gh6pm_startup_ccs.obj" \
 "../tm4c123gh6pm.cmd" \
 $(GEN_CMDS__FLAG) \
@@ -145,8 +148,8 @@ project.out: $(OBJS) $(CMD_SRCS) $(GEN_CMDS)
 # Other Targets
 clean:
 	-$(RM) $(EXE_OUTPUTS__QUOTED)
-	-$(RM) "Scheduler.obj" "Utils.obj" "main.obj" "tm4c123gh6pm_startup_ccs.obj" 
-	-$(RM) "Scheduler.d" "Utils.d" "main.d" "tm4c123gh6pm_startup_ccs.d" 
+	-$(RM) "Scheduler.obj" "Timer.obj" "Utils.obj" "lcd.obj" "main.obj" "testTasks.obj" "tm4c123gh6pm_startup_ccs.obj" 
+	-$(RM) "Scheduler.d" "Timer.d" "Utils.d" "lcd.d" "main.d" "testTasks.d" "tm4c123gh6pm_startup_ccs.d" 
 	-@echo 'Finished clean'
 	-@echo ' '
 

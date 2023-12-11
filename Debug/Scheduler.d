@@ -14,6 +14,9 @@ Scheduler.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/ma
 Scheduler.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_stdint.h
 Scheduler.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h
 Scheduler.obj: ../Utils.h
+Scheduler.obj: ../Timer.h
+Scheduler.obj: C:/ti/TivaWare_C_Series-2.2.0.295/inc/tm4c123gh6pm.h
+Scheduler.obj: C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/interrupt.h
 Scheduler.obj: C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h
 
 ../Scheduler.c:
@@ -43,6 +46,12 @@ C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/sys/_stdint.h:
 C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdbool.h:
 
 ../Utils.h:
+
+../Timer.h:
+
+C:/ti/TivaWare_C_Series-2.2.0.295/inc/tm4c123gh6pm.h:
+
+C:/ti/TivaWare_C_Series-2.2.0.295/driverlib/interrupt.h:
 
 C:/ti/ccs1230/ccs/tools/compiler/ti-cgt-arm_20.2.7.LTS/include/stdlib.h:
 
